@@ -324,6 +324,78 @@ FROM (
 ) AS cp;
 
 
+--SET OPERATOR ------------------------------------------------------------------------------------------------
+
+-- Membuat tabel baru dengan nama 'guestbooks'
+-- Kolom 'id' sebagai primary key bertipe INT dan auto increment
+-- Kolom 'email' bertipe VARCHAR(100) untuk menyimpan alamat email pengunjung
+-- Kolom 'title' bertipe VARCHAR(200) untuk judul pesan
+-- Kolom 'content' bertipe TEXT untuk isi pesan
+CREATE TABLE guestbooks
+(
+    id      INT NOT NULL AUTO_INCREMENT,
+    email   VARCHAR(100),
+    title   VARCHAR(200),
+    content TEXT,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO guestbooks(email, title, content)
+VALUES ('guest@gmail.com', 'Hello', 'Hello'),
+       ('guest2@gmail.com', 'Hello', 'Hello'),
+       ('guest3@gmail.com', 'Hello', 'Hello'),
+       ('eko@gmail.com', 'Hello', 'Hello'),
+       ('eko@gmail.com', 'Hello', 'Hello'),
+       ('eko@gmail.com', 'Hello', 'Hello');
+
+
+-- Mengambil daftar email unik dari dua tabel: 'customers' dan 'guestbooks'
+-- UNION digunakan untuk menggabungkan hasil kedua SELECT tanpa duplikasi
+-- Hanya email yang berbeda (distinct) yang akan ditampilkan di hasil akhir
+SELECT email
+FROM customers
+UNION
+SELECT email
+FROM guestbooks;
+
+-- Mengambil daftar semua email dari tabel 'customers' dan 'guestbooks'
+-- UNION ALL digunakan untuk menggabungkan hasil kedua SELECT tanpa menghapus duplikasi
+-- Semua email, termasuk yang sama, akan ditampilkan sebanyak kemunculannya
+SELECT email
+FROM customers
+UNION ALL
+SELECT email
+FROM guestbooks;
+
+-- Menggabungkan semua email dari tabel 'customers' dan 'guestbooks' menggunakan UNION ALL
+-- Hasil penggabungan diberi alias sementara 'emails'
+-- Mengelompokkan data berdasarkan alamat email
+-- Menghitung jumlah kemunculan setiap email dari kedua tabel tersebut
+SELECT emails.email, COUNT(emails.email)
+FROM (
+    SELECT email
+    FROM customers
+    UNION ALL
+    SELECT email
+    FROM guestbooks
+) AS emails
+GROUP BY emails.email;
+
+-- Mengambil daftar email yang ada di kedua tabel: 'customers' dan 'guestbooks'
+-- Subquery digunakan untuk memilih email unik dari tabel 'guestbooks'
+-- Hanya email yang ada di kedua tabel yang akan ditampilkan (dengan menggunakan klausa IN)
+SELECT DISTINCT email
+FROM customers
+WHERE email IN (SELECT DISTINCT email FROM guestbooks);
+
+
+-- Mengambil daftar email unik dari tabel 'customers' yang tidak ada di tabel 'guestbooks'
+-- Menggunakan LEFT JOIN untuk menampilkan semua email dari 'customers' dan mencocokkannya dengan 'guestbooks'
+-- Kondisi WHERE memastikan hanya email yang tidak ada di 'guestbooks' yang ditampilkan (guestbooks.email IS NULL)
+SELECT DISTINCT customers.email, guestbooks.email
+FROM customers
+         LEFT JOIN guestbooks ON (customers.email = guestbooks.email)
+WHERE guestbooks.email IS NULL;
 
 
 
